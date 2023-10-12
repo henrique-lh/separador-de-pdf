@@ -1,5 +1,7 @@
 # Pdf Splitter
 
+Automação criada para permitir automações locais em arquivos do tipo PDF
+
 ### To-do
 
 - [x] Automatizar coleta de páginas para formação de chunks

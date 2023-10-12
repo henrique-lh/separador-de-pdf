@@ -18,9 +18,7 @@ em seguida, basta executar o último comando passando os parâmetros necessário
 ### To-do
 
 - [ ] Permitir que chunks sejam gerados tanto por qt de páginas quanto por intervalos
-- [ ] Criar interface para coletar pdf
-- [ ] Permitir passar um link para baixar arquivo
 - [ ] Criar automação para envio de arquivos para onedrive/google drive
-- [ ] Criar comando via terminal
+- [x] Criar comando via terminal
 - [x] Verificar questão de caminhos no python
 - [x] Automatizar coleta de páginas para formação de chunks

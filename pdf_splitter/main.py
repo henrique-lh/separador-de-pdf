@@ -24,14 +24,14 @@ def write_pdf(pdf_reader: PdfReader, pdf_writer: PdfWriter, output: str, start: 
 
 
 @app.command()
-def split(
+def cut(
         path: Annotated[str, typer.Option(help='Caminho do pdf')],
         name_of_split: Annotated[str, typer.Option(help='Nome do novo pdf')],
         folder: Annotated[str, typer.Option(help='Local onde será salvo o pdf')],
         start: Annotated[int, typer.Option(help='Página de inicio')] = 0,
         end: Annotated[int, typer.Option(help='Página de fim')] = None
     ):
-    """Raises: ValueError: Valor de página que não é possível acessar/escrever"""
+    """Corta um pdf em local específico"""
 
     pdf = PdfReader(path)
 
@@ -52,12 +52,14 @@ def split(
 
 
 @app.command()
-def group_in_chunks(
+def batch(
         path: Annotated[str, typer.Option(help='Caminho do pdf')],
         name: Annotated[str, typer.Option(help='Nome do novo pdf')],
         folder: Annotated[str, typer.Option(help='Local onde será salvo o pdf')], 
-        n: Annotated[int, typer.Option(help='Quantidade de página em cada lote')]
+        n: Annotated[int, typer.Option(help='Quantidade de página em cada lote')],
+        send: Annotated[bool, typer.Option(help='Define se arquivo será ou não enviado ao drive')] = False
     ):
+    """Agrupa em lotes um pdf"""
     pdf = PdfReader(path)
     
     if not os.path.isdir(folder):
@@ -77,6 +79,9 @@ def group_in_chunks(
         write_pdf(pdf_reader=pdf, pdf_writer=pdf_writer, output=output, start=start, end=len(pdf.pages))
 
     typer.echo(f'PDF salvo em: {folder}')
+
+    if send:
+        typer.echo('Enviando pdf para drive')
 
 
 if __name__ == '__main__':

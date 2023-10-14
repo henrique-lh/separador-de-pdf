@@ -1,6 +1,8 @@
 import os
 from PyPDF2 import PdfReader, PdfWriter
 import typer
+from typing_extensions import Annotated
+
 
 app = typer.Typer()
 
@@ -22,19 +24,14 @@ def write_pdf(pdf_reader: PdfReader, pdf_writer: PdfWriter, output: str, start: 
 
 
 @app.command()
-def split(path: str, name_of_split: str, folder: str, start: int=0, end: int=None):
-    """Corta um pdf de uma página x até uma uma página y
-
-    Args:
-        path (str): Caminho do pdf
-        name_of_split (str): Nome do novo pdf
-        folder (str): Local onde será salvo o pdf
-        start (int, optional): Página de inicio. Defaults to 0.
-        end (int, optional): Página de fim. Defaults to None.
-
-    Raises:
-        ValueError: Valor de página que não é possível acessar/escrever
-    """
+def split(
+        path: Annotated[str, typer.Option(help='Caminho do pdf')],
+        name_of_split: Annotated[str, typer.Option(help='Nome do novo pdf')],
+        folder: Annotated[str, typer.Option(help='Local onde será salvo o pdf')],
+        start: Annotated[int, typer.Option(help='Página de inicio')] = 0,
+        end: Annotated[int, typer.Option(help='Página de fim')] = None
+    ):
+    """Raises: ValueError: Valor de página que não é possível acessar/escrever"""
 
     pdf = PdfReader(path)
 
@@ -55,21 +52,12 @@ def split(path: str, name_of_split: str, folder: str, start: int=0, end: int=Non
 
 
 @app.command()
-def group_in_chunks(path: str, name: str, folder: str, n: int):
-    """Agrupa um arquivo pdf em lotes iguais
-
-    Args:
-        path (str): Caminho do pdf
-        name (str): Nome do novo pdf
-        folder (str): Local onde será salvo o pdf
-        n (int): Quantidade de página em cada lote
-
-    Examples:
-        1) Dividir um pdf de 50 páginas em 10 páginas iguais, totalizando 5 lotes
-            divmod(50, 10) = (5, 0)
-        2) Dividir um pdf de 51 páginas em 10 páginas iguais, totalizando 6 lotes
-            divmod(51, 10) = (5, 1)
-    """
+def group_in_chunks(
+        path: Annotated[str, typer.Option(help='Caminho do pdf')],
+        name: Annotated[str, typer.Option(help='Nome do novo pdf')],
+        folder: Annotated[str, typer.Option(help='Local onde será salvo o pdf')], 
+        n: Annotated[int, typer.Option(help='Quantidade de página em cada lote')]
+    ):
     pdf = PdfReader(path)
     
     if not os.path.isdir(folder):
@@ -88,7 +76,7 @@ def group_in_chunks(path: str, name: str, folder: str, n: int):
         output = os.path.join(folder, f'{name}_{t+1}.pdf')
         write_pdf(pdf_reader=pdf, pdf_writer=pdf_writer, output=output, start=start, end=len(pdf.pages))
 
-    print('PDF salvo em:', folder)
+    typer.echo(f'PDF salvo em: {folder}')
 
 
 if __name__ == '__main__':

@@ -2,6 +2,8 @@ import os
 from PyPDF2 import PdfReader, PdfWriter
 import typer
 from typing_extensions import Annotated
+import shutil
+from drive_script import create_folder, upload_files
 
 
 app = typer.Typer()
@@ -29,7 +31,8 @@ def cut(
         name_of_split: Annotated[str, typer.Option(help='Nome do novo pdf')],
         folder: Annotated[str, typer.Option(help='Local onde será salvo o pdf')],
         start: Annotated[int, typer.Option(help='Página de inicio')] = 0,
-        end: Annotated[int, typer.Option(help='Página de fim')] = None
+        end: Annotated[int, typer.Option(help='Página de fim')] = None,
+        send: Annotated[bool, typer.Option(help='Define se arquivo será ou não enviado ao drive')] = False
     ):
     """Corta um pdf em local específico"""
 
@@ -43,12 +46,16 @@ def cut(
     
     pdf_writer = PdfWriter()
     
-    if not os.path.isdir(folder):
-        os.mkdir(folder)
+    if os.path.isdir(folder):
+        shutil.rmtree(folder)
+    os.mkdir(folder)
 
     output = os.path.join(folder, f'{name_of_split}.pdf')
 
     write_pdf(pdf_reader=pdf, pdf_writer=pdf_writer, output=output, start=start, end=end)
+
+    if send:
+        upload_files(*create_folder(folder))
 
 
 @app.command()
@@ -62,8 +69,9 @@ def batch(
     """Agrupa em lotes um pdf"""
     pdf = PdfReader(path)
     
-    if not os.path.isdir(folder):
-        os.mkdir(folder)
+    if os.path.isdir(folder):
+        shutil.rmtree(folder)
+    os.mkdir(folder)
 
     x, y = divmod(len(pdf.pages), n)
     start, end = 0, n
@@ -81,7 +89,7 @@ def batch(
     typer.echo(f'PDF salvo em: {folder}')
 
     if send:
-        typer.echo('Enviando pdf para drive')
+        upload_files(*create_folder(folder))
 
 
 if __name__ == '__main__':

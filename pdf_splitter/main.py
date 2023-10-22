@@ -91,6 +91,16 @@ def batch(
     if send:
         upload_files(*create_folder(folder))
 
+@app.command()
+def upload(
+        path: Annotated[str, typer.Option(help='Caminho do pdf a ser carregado')],
+        folder_id: Annotated[str, typer.Option(help='ID de uma pasta no drive')]
+    ):
+    """Envia um pdf para o drive"""
+    folder = os.path.dirname(path)
+    file = os.path.basename(path)
+    upload_files(folder_id=folder_id, folder=folder, specific_file=path)
+
 
 if __name__ == '__main__':
     app()

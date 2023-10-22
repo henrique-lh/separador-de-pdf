@@ -22,7 +22,7 @@ def create_folder(folder):
         creds = Credentials.from_authorized_user_file(path_to_secret_json, SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh_token(Request())
+            creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 os.getenv('PATH_TO_CREDENTIALS_JSON'), SCOPES
@@ -47,7 +47,7 @@ def create_folder(folder):
         print(f'Ocorreu um erro: {error}')
 
 
-def upload_files(folder_id, folder):
+def upload_files(folder_id, folder, specific_file: str = None):
     creds = None
     
     path_to_secret_json = os.getenv('PATH_TO_SECRET_JSON')
@@ -55,7 +55,7 @@ def upload_files(folder_id, folder):
         creds = Credentials.from_authorized_user_file(path_to_secret_json, SCOPES)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh_token(Request())
+            creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 os.getenv('PATH_TO_CREDENTIALS_JSON'), SCOPES
@@ -68,6 +68,8 @@ def upload_files(folder_id, folder):
         service = build('drive', 'v3', credentials=creds)
 
         for file in glob.glob(f'{folder}/*.pdf'):
+            if file != specific_file:
+                continue
             file_metadata = {
                 'name': os.path.basename(file),
                 'parents': [folder_id],
@@ -75,6 +77,6 @@ def upload_files(folder_id, folder):
             media = MediaFileUpload(file, mimetype='application/pdf')
             _file = service.files().create(body=file_metadata, media_body=media,
                                       fields='id').execute()
-            print(f'Arquivo {file} criado com sucesso -> ID: {_file.get("id")}')
+            print(f'Arquivo {file} salvo com sucesso -> ID: {_file.get("id")}')
     except HttpError as error:
         print(f'Ocorreu um erro: {error}')

@@ -98,7 +98,6 @@ def upload(
     ):
     """Envia um pdf para o drive"""
     folder = os.path.dirname(path)
-    file = os.path.basename(path)
     upload_files(folder_id=folder_id, folder=folder, specific_file=path)
 
 
